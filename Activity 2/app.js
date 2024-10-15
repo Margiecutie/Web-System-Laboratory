@@ -1,54 +1,74 @@
-const title = document.getElementById('song-title');
-const artist = document.getElementById('artist-name');
-const addbutton = document.getElementById('add-button');
-const ul = document.getElementById('Songlist');
+document.addEventListener('DOMContentLoaded', () => {
+    const addButton = document.getElementById('add-button');
+    const songList = document.getElementById('Songlist');
+    const songTitleInput = document.getElementById('song-title');
+    const artistNameInput = document.getElementById('artist-name');
+    const searchBar = document.querySelector('.search-bar');
 
-addbutton.addEventListener('click', () => {
-    const newTitle = title.value;
-    const newArtist = artist.value;
-
-    // Check if inputs are not empty
-    if (newTitle === '' || newArtist === '') {
-        alert('Please enter both title and artist.');
-        return;
+    
+    function attachDeleteFunctionality(button) {
+        button.addEventListener('click', () => {
+            const listItem = button.closest('.song-item');
+            songList.removeChild(listItem);
+        });
     }
 
-    // Create elements
-    const li = document.createElement('li');
-    const div = document.createElement('div');
-    const p = document.createElement('p');
-    const small = document.createElement('small');
-    const deleteButton = document.createElement('button');
-    const hr = document.createElement('hr');
-
-    // Set values to the elements
-    p.innerHTML = newTitle;
-    small.innerHTML = newArtist;
-    deleteButton.innerHTML = 'Delete';
-    deleteButton.className = 'btn btn-danger btn-sm'; 
-
-    // Append elements
-    div.classList.add('d-flex', 'justify-content-between', 'align-items-start'); 
-    div.append(p); // Title
-    div.append(deleteButton); // Delete button
-    li.append(div);
     
-    // Create a separate div for artist
-    const artistDiv = document.createElement('div');
-    artistDiv.classList.add('text'); 
-    artistDiv.append(small); 
-    li.append(artistDiv); 
-
-    ul.append(li);
-    ul.append(hr); 
+    const deleteButtons = document.querySelectorAll('.btn-danger');
+    deleteButtons.forEach(button => attachDeleteFunctionality(button));
 
     
-    deleteButton.addEventListener('click', () => {
-        ul.removeChild(li);
-        ul.removeChild(hr); 
-    });
+    function createSongItem(title, artist) {
+        const listItem = document.createElement('li');
+        listItem.className = 'song-item';
+        listItem.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="song-title">${title}</p>
+                    <small class="artist-name"> - ${artist}</small>
+                </div>
+                <button class="btn btn-danger">Delete</button>
+            </div>
+            <hr>
+        `;
 
-   
-    title.value = '';
-    artist.value = '';
+        
+        const deleteButton = listItem.querySelector('.btn-danger');
+        attachDeleteFunctionality(deleteButton);
+
+        return listItem;
+    }
+
+    
+    function addSong() {
+        const songTitle = songTitleInput.value.trim();
+        const artistName = artistNameInput.value.trim();
+
+        if (songTitle && artistName) {
+            songList.appendChild(createSongItem(songTitle, artistName));
+
+            
+            songTitleInput.value = '';
+            artistNameInput.value = '';
+        } else {
+            alert('Please enter both song title and artist name.');
+        }
+    }
+
+    
+    function filterSongs() {
+        const searchText = searchBar.value.toLowerCase();
+        const songs = songList.getElementsByTagName('li');
+
+        for (let song of songs) {
+            const title = song.querySelector('.song-title').textContent.toLowerCase();
+            const artist = song.querySelector('.artist-name').textContent.toLowerCase();
+            const isMatch = title.includes(searchText) || artist.includes(searchText);
+            song.style.display = isMatch ? '' : 'none';
+        }
+    }
+
+    
+    addButton.addEventListener('click', addSong);
+    searchBar.addEventListener('input', filterSongs);
 });
