@@ -18,6 +18,8 @@ body {
     margin-bottom: 5%;
     margin-top: 3%;
     margin-left: 75%;
+    color: rgb(255, 255, 255);
+    border: solid black;
 }
 .fw-bold{
     margin-left: 2%;
